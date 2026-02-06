@@ -106,28 +106,43 @@ pre {
       <div class="container">
         <h2>Host View</h2>
         <p>Share this link:</p>
-        <pre>https://anon-feedback-pink.vercel.app/chat/${id}</pre>
-        
-        <h3>Messages</h3>
-        <ul>${messages}</ul>
-        </div>
-        
-        <script>
-        setTimeout(() => location.reload(), 2000);
-        </script>
-        </body>
-        </html>
-        `);
-      });
-      
-      // <pre>http://localhost:${PORT}/chat/${id}</pre>
-// Guest chat
-app.get('/chat/:id', (req, res) => {
-  const { id } = req.params;
-  if (!sessions[id]) return res.send('Invalid session');
+<pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
+<button onclick="copyLink()">Copy link</button>
 
-  res.sendFile(path.join(__dirname, 'views', 'chat.html'));
-});
+<script>
+function copyLink() {
+  const linkText = document.getElementById('shareLink').innerText;
+  
+  navigator.clipboard.writeText(linkText)
+  .then(() => {
+    alert('Link copied to clipboard');
+    })
+    .catch(err => {
+      console.error('Failed to copy:', err);
+      });
+      }
+      </script>
+      
+      <h3 style="margin-top: 20px;">Messages</h3>
+      <ul>${messages}</ul>
+      </div>
+      
+      <script>
+      setTimeout(() => location.reload(), 2000);
+      </script>
+      </body>
+      </html>
+      `);
+    });
+    
+    // Guest chat
+    app.get('/chat/:id', (req, res) => {
+      const { id } = req.params;
+      if (!sessions[id]) return res.send('Invalid session');
+      
+      res.sendFile(path.join(__dirname, 'views', 'chat.html'));
+    });
+    // <pre>http://localhost:${PORT}/chat/${id}</pre>
 
 // Receive message
 app.post('/chat/:id', (req, res) => {
