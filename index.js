@@ -45,6 +45,8 @@ app.get('/host/:id', (req, res) => {
     <html>
     <head>
       <title>Host View</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
       <link rel="stylesheet" href="/style.css">
         <style>
     body {
@@ -102,7 +104,7 @@ pre {
   </style>
     </head>
     <body>
-  <div class="container" style="text-align: center;min-width: 600px;max-width: 720px;">        <h2>Host View</h2>
+  <div class="container" style="text-align: center;max-width: 720px;">        <h2>Host View</h2>
         <p>Share this link:</p>
 <pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
 <button onclick="copyLink()">Copy link</button>
