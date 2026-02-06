@@ -55,7 +55,6 @@ app.get('/host/:id', (req, res) => {
 }
 
 .container {
-  max-width: 500px;
   margin: auto;
   background: white;
   padding: 30px;
@@ -81,7 +80,7 @@ button {
   border-radius: 4px;
   background: #2563eb;
   color: white;
-  font-size: 14px;
+  font-size: 1.1rem;
   cursor: pointer;
 }
 
@@ -103,8 +102,7 @@ pre {
   </style>
     </head>
     <body>
-      <div class="container">
-        <h2>Host View</h2>
+  <div class="container" style="text-align: center;min-width: 600px;max-width: 720px;">        <h2>Host View</h2>
         <p>Share this link:</p>
 <pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
 <button onclick="copyLink()">Copy link</button>
