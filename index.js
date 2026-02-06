@@ -5,13 +5,13 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// In-memory storage
+// sessionId -> { messages: [], hostToken }
 const sessions = {};
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files (CSS)
+// Static files (CSS, JS)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Helper
@@ -19,149 +19,147 @@ function createId() {
   return crypto.randomUUID();
 }
 
-// Home page
+/**
+ * Home page
+ */
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
 
-// Create session
+/**
+ * Create new session
+ */
 app.post('/create', (req, res) => {
   const sessionId = createId();
-  sessions[sessionId] = [];
-  res.redirect(`/host/${sessionId}`);
+  const hostToken = createId();
+
+  sessions[sessionId] = {
+    messages: [],
+    hostToken
+  };
+
+  // Host token is private — only creator gets it
+  res.redirect(`/host/${sessionId}?token=${hostToken}`);
 });
 
-// Host view
+/**
+ * Host view (PROTECTED)
+ */
 app.get('/host/:id', (req, res) => {
   const { id } = req.params;
-  if (!sessions[id]) return res.send('Invalid session');
+  const { token } = req.query;
 
-  const messages = sessions[id]
+  const session = sessions[id];
+  if (!session) return res.status(404).send('Invalid session');
+
+  if (token !== session.hostToken) {
+    return res.status(403).send('Unauthorized');
+  }
+
+  const messages = session.messages
     .map(m => `<li class="message-card">${m}</li>`)
     .join('');
 
   res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Host View</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-      <link rel="stylesheet" href="/style.css">
-        <style>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Host View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/style.css">
+  <style>
     body {
-  font-family: system-ui, Arial, sans-serif;
-  background: #f4f6f8;
-  margin: 0;
-  padding: 40px;
-}
-
-.container {
-  margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
-.message-card{
-  background: white;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  text-align: left;
-  list-style: none;
-}
-  }
-h2, h3 {
-  margin-top: 0;
-}
-
-input,textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  background: #2563eb;
-  color: white;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1e40af;
-}
-
-ul {
-  padding-left: 18px;
-}
-
-pre {
-  background: #f1f5f9;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
+      font-family: system-ui, Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+      margin: 0;
+    }
+    .container {
+      max-width: 720px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .message-card {
+      background: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      list-style: none;
+      text-align: left;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    pre {
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
   </style>
-    </head>
-    <body>
-  <div class="container" style="text-align: center;max-width: 720px;"> 
-         <h2>Host View</h2>
-        <p>Share this link:</p>
-<pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
-<button onclick="copyLink()">Copy link</button>
+</head>
+<body>
+
+<div class="container">
+  <h2>Host View</h2>
+  <p>Share this link:</p>
+  <pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
+  <button onclick="copyLink()">Copy link</button>
+</div>
+
+<div class="container" style="margin-top:30px">
+  <h3>Messages</h3>
+  <ul>${messages}</ul>
+</div>
 
 <script>
-function copyLink() {
-  const linkText = document.getElementById('shareLink').innerText;
-  
-  navigator.clipboard.writeText(linkText)
-  .then(() => {
-    alert('Link copied to clipboard');
-    })
-    .catch(err => {
-      console.error('Failed to copy:', err);
-      });
-      }
-      </script>
-      
-      </div>
-        <div class="container" style="text-align: center;max-width: 720px;margin-top: 30px;padding-top: 10px;"> 
-      <h3 style="margin-top: 20px;">Messages</h3>
-      <ul>${messages}</ul>
-      </div>
-      <script>
-      setTimeout(() => location.reload(), 2000);
-      </script>
-      </body>
-      </html>
-      `);
-    });
-    // <pre>http://localhost:${PORT}/chat/${id}</pre>
-    
-    // Guest chat
-    app.get('/chat/:id', (req, res) => {
-      const { id } = req.params;
-      if (!sessions[id]) return res.send('Invalid session');
-      
-      res.sendFile(path.join(__dirname, 'views', 'chat.html'));
-    });
+  function copyLink() {
+    navigator.clipboard.writeText(
+      document.getElementById('shareLink').innerText
+    ).then(() => alert('Link copied'));
+  }
 
-// Receive message
+  // Auto-refresh every 2s
+  setTimeout(() => location.reload(), 2000);
+</script>
+
+</body>
+</html>
+  `);
+});
+
+/**
+ * Guest chat page
+ */
+app.get('/chat/:id', (req, res) => {
+  const { id } = req.params;
+  if (!sessions[id]) return res.send('Invalid session');
+
+  res.sendFile(path.join(__dirname, 'views', 'chat.html'));
+});
+
+/**
+ * Receive guest message
+ */
 app.post('/chat/:id', (req, res) => {
   const { id } = req.params;
   const { message } = req.body;
 
   if (sessions[id] && message) {
-    sessions[id].push(message);
+    sessions[id].messages.push(message);
   }
 
   res.redirect(`/chat/${id}`);
