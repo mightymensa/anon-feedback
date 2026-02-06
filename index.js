@@ -37,7 +37,7 @@ app.get('/host/:id', (req, res) => {
   if (!sessions[id]) return res.send('Invalid session');
 
   const messages = sessions[id]
-    .map(m => `<li>${m}</li>`)
+    .map(m => `<li class="message-card">${m}</li>`)
     .join('');
 
   res.send(`
@@ -63,7 +63,16 @@ app.get('/host/:id', (req, res) => {
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
-
+.message-card{
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  text-align: left;
+  list-style: none;
+}
+  }
 h2, h3 {
   margin-top: 0;
 }
@@ -104,7 +113,8 @@ pre {
   </style>
     </head>
     <body>
-  <div class="container" style="text-align: center;max-width: 720px;">        <h2>Host View</h2>
+  <div class="container" style="text-align: center;max-width: 720px;"> 
+         <h2>Host View</h2>
         <p>Share this link:</p>
 <pre id="shareLink">https://anon-feedback-pink.vercel.app/chat/${id}</pre>
 <button onclick="copyLink()">Copy link</button>
@@ -123,10 +133,11 @@ function copyLink() {
       }
       </script>
       
+      </div>
+        <div class="container" style="text-align: center;max-width: 720px;margin-top: 30px;padding-top: 10px;"> 
       <h3 style="margin-top: 20px;">Messages</h3>
       <ul>${messages}</ul>
       </div>
-      
       <script>
       setTimeout(() => location.reload(), 2000);
       </script>
@@ -134,6 +145,7 @@ function copyLink() {
       </html>
       `);
     });
+    // <pre>http://localhost:${PORT}/chat/${id}</pre>
     
     // Guest chat
     app.get('/chat/:id', (req, res) => {
@@ -142,7 +154,6 @@ function copyLink() {
       
       res.sendFile(path.join(__dirname, 'views', 'chat.html'));
     });
-    // <pre>http://localhost:${PORT}/chat/${id}</pre>
 
 // Receive message
 app.post('/chat/:id', (req, res) => {
