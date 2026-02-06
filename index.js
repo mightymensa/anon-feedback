@@ -55,11 +55,18 @@ app.get('/host/:id', (req, res) => {
   if (token !== session.hostToken) {
     return res.status(403).send('Unauthorized');
   }
-
-  const messages = session.messages
-    .map(m => `<li class="message-card">${m}</li>`)
+  // session.messages = ["Welcome to the anonymous feedback sessionWelcome to the anonymous feedback sessionWelcome to the anonymous feedback sessionWelcome to the anonymous feedback session!"];
+  var messages = session.messages
+    .map(m => `<li class="message-card">
+      <span class="message-text">
+      ${m}
+      </span>
+      <button onclick="copyMessage(this)">Copy</button>
+      </li>`)
     .join('');
-
+  if (messages.length === 0) {
+    messages = '<li style="list-style:none;color:#888;font-size:14px;text-align:left">No messages yet</li>';
+  }
   res.send(`
 <!DOCTYPE html>
 <html>
@@ -91,6 +98,8 @@ app.get('/host/:id', (req, res) => {
       margin-bottom: 12px;
       list-style: none;
       text-align: left;
+      display: flex;
+      justify-content: space-between;
     }
     button {
       padding: 10px 16px;
@@ -135,7 +144,23 @@ app.get('/host/:id', (req, res) => {
   // Auto-refresh every 2s
   setTimeout(() => location.reload(), 2000);
 </script>
+<script>
+  function copyMessage(button) {
+    const text = button
+      .closest('.message-card')
+      .querySelector('.message-text')
+      .innerText;
 
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        button.innerText = 'Copied';
+        setTimeout(() => button.innerText = 'Copy', 1500);
+      })
+      .catch(err => {
+        console.error('Copy failed:', err);
+      });
+  }
+</script>
 </body>
 </html>
   `);
