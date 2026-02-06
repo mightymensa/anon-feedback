@@ -67,7 +67,7 @@ h2, h3 {
   margin-top: 0;
 }
 
-input {
+input,textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 12px;
