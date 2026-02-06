@@ -106,19 +106,20 @@ pre {
       <div class="container">
         <h2>Host View</h2>
         <p>Share this link:</p>
-        <pre>http://localhost:${PORT}/chat/${id}</pre>
-
+        <pre>https://anon-feedback-pink.vercel.app/chat/${id}</pre>
+        
         <h3>Messages</h3>
         <ul>${messages}</ul>
-      </div>
-
-      <script>
+        </div>
+        
+        <script>
         setTimeout(() => location.reload(), 2000);
-      </script>
-    </body>
-    </html>
-  `);
-});
+        </script>
+        </body>
+        </html>
+        `);
+      });
+      // <pre>http://localhost:${PORT}/chat/${id}</pre>
 
 // Guest chat
 app.get('/chat/:id', (req, res) => {
