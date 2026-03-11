@@ -155,11 +155,11 @@ app.get('/host/:id', async (req, res) => {
 
 <script>
 
-function copyLink(){
-navigator.clipboard.writeText(
-document.getElementById('shareLink').innerText
-)
-}
+  function copyLink() {
+    navigator.clipboard.writeText(
+      document.getElementById('shareLink').innerText
+    ).then(() => alert('Link copied'));
+  }
 
 setTimeout(()=>location.reload(),2000)
 
