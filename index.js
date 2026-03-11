@@ -12,6 +12,7 @@ const SESSION_TTL = 60 * 60 * 24;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 function createId() {
