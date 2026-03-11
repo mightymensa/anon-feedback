@@ -2,10 +2,12 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 
-import { createClient } from 'redis';
+var redis;
+const {createClient}  = require('redis');
+
 (async function initRedis() {
     
-    const redis = await createClient({ url: process.env.REDIS_URL }).connect();
+    redis = await createClient({ url: process.env.REDIS_URL }).connect();
 })();
 
 const app = express();
