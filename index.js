@@ -1,7 +1,10 @@
 const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
-const { kv } = require('@vercel/kv');
+
+import { createClient } from 'redis';
+
+const redis = await createClient({ url: process.env.REDIS_URL }).connect();
 
 const app = express();
 const PORT = 3000;
@@ -42,8 +45,8 @@ app.post('/create', async (req, res) => {
     messages: [],
     hostToken
   };
-
-  await kv.set(sessionKey(sessionId), session, { ex: SESSION_TTL });
+// await redis.set('key', 'value');
+  await redis.set(sessionKey(sessionId), session);
 
   res.redirect(`/host/${sessionId}?token=${hostToken}`);
 });
@@ -56,7 +59,7 @@ app.get('/host/:id', async (req, res) => {
   const { id } = req.params;
   const { token } = req.query;
 
-  const session = await kv.get(sessionKey(id));
+  const session = await redis.get(sessionKey(id));
 
   if (!session) return res.status(404).send('Invalid session');
 
@@ -140,7 +143,7 @@ app.get('/chat/:id', async (req, res) => {
 
   const { id } = req.params;
 
-  const session = await kv.get(sessionKey(id));
+  const session = await redis.get(sessionKey(id));
 
   if (!session) return res.send('Invalid session');
 
@@ -155,13 +158,13 @@ app.post('/chat/:id', async (req, res) => {
   const { id } = req.params;
   const { message } = req.body;
 
-  const session = await kv.get(sessionKey(id));
+  const session = await redis.get(sessionKey(id));
 
   if (session && message) {
 
     session.messages.push(message);
 
-    await kv.set(sessionKey(id), session, { ex: SESSION_TTL });
+    await redis.set(sessionKey(id), session);
 
   }
 
