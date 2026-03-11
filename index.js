@@ -50,7 +50,7 @@ app.post('/create', async (req, res) => {
     hostToken
   };
 // await redis.set('key', 'value');
-  await redis.set(sessionKey(sessionId), session);
+  await redis.set(sessionKey(sessionId), JSON.stringify(session));
 
   res.redirect(`/host/${sessionId}?token=${hostToken}`);
 });
@@ -64,14 +64,15 @@ app.get('/host/:id', async (req, res) => {
   const { token } = req.query;
 
   const session = await redis.get(sessionKey(id));
+  const parsedSession = JSON.parse(session);
 
   if (!session) return res.status(404).send('Invalid session');
 
-  if (token !== session.hostToken) {
+  if (token !== parsedSession.hostToken) {
     return res.status(403).send('Unauthorized');
   }
 
-  let messages = session.messages
+  let messages = parsedSession.messages
     .map(m => `<li class="message-card">
       <span class="message-text">${m}</span>
       <button onclick="copyMessage(this)">Copy</button>
@@ -165,10 +166,10 @@ app.post('/chat/:id', async (req, res) => {
   const session = await redis.get(sessionKey(id));
 
   if (session && message) {
+    const parsedSession = JSON.parse(session);
+    parsedSession.messages.push(message);
 
-    session.messages.push(message);
-
-    await redis.set(sessionKey(id), session);
+    await redis.set(sessionKey(id), JSON.stringify(parsedSession));
 
   }
 
