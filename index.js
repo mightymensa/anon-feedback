@@ -176,6 +176,7 @@ app.get('/chat/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'chat.html'));
 });
 
+
 /**
  * Receive guest message
  */
