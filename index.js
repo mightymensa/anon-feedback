@@ -89,7 +89,51 @@ app.get('/host/:id', async (req, res) => {
 <head>
 <title>Host View</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/style.css">
+ <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+      margin: 0;
+    }
+    .container {
+      max-width: 720px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .message-card {
+      background: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      list-style: none;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    pre {
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
 </head>
 
 <body>
