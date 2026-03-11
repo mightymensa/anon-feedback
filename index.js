@@ -3,8 +3,10 @@ const crypto = require('crypto');
 const path = require('path');
 
 import { createClient } from 'redis';
-
-const redis = await createClient({ url: process.env.REDIS_URL }).connect();
+(async function initRedis() {
+    
+    const redis = await createClient({ url: process.env.REDIS_URL }).connect();
+})();
 
 const app = express();
 const PORT = 3000;
